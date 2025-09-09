@@ -1,11 +1,14 @@
 # app.py
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_socketio import SocketIO, emit
 
 # App-Konfiguration
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dies-ist-ein-sehr-geheimer-schluessel'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -13,6 +16,18 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# --- Mindmap-Daten (einfaches Beispiel, später DB) ---
+mindmap_data = {
+    "id": "root",
+    "topic": "Team Mindmap",
+    "children": [
+        {"id": "1", "topic": "Projekt", "children": []},
+        {"id": "2", "topic": "Aufgaben", "children": []},
+        {"id": "3", "topic": "Ideen", "children": []}
+    ]
+}
 
 # --- Datenbank-Modelle ---
 
@@ -63,14 +78,27 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
 @app.route('/')
 @login_required
 def index():
     tasks = Task.query.filter_by(user_id=current_user.id).all()
-    # ÄNDERUNG: Lädt ALLE Notizen, nicht nur die des Benutzers
     notes = Note.query.all()
     events = CalendarEvent.query.filter_by(user_id=current_user.id).all()
-    return render_template('index.html', name=current_user.username, tasks=tasks, notes=notes, events=events)
+    return render_template('index.html', name=current_user.username, tasks=tasks, notes=notes, events=events, mindmap_data=mindmap_data)
+
+# API-Endpunkt für initiale Mindmap-Daten
+@app.route('/mindmap_data')
+@login_required
+def get_mindmap_data():
+    return jsonify(mindmap_data)
+
+# SocketIO-Events für Mindmap
+@socketio.on('update_mindmap')
+def handle_update_mindmap(data):
+    global mindmap_data
+    mindmap_data = data
+    emit('mindmap_update', data, broadcast=True)
 
 # --- Checklisten-Routen (unverändert) ---
 @app.route('/add_task', methods=['POST'])
@@ -157,4 +185,4 @@ def setup_database(app):
 
 if __name__ == '__main__':
     setup_database(app)
-    app.run(debug=True)
+    socketio.run(app, debug=True)

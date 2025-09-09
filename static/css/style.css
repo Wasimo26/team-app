@@ -1,26 +1,26 @@
 /* Generelle Styles */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    color: #fff;
     margin: 0;
 }
 
 .container {
     padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 25px;
-    max-width: 1400px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
 header {
-    background: #ffffff;
-    color: #333;
-    padding: 15px 30px;
+    background: #232526;
+    color: #ffffff;
+    padding: 18px 30px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #444;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -28,29 +28,33 @@ header {
 
 header h1 {
     margin: 0;
-    font-size: 1.5em;
+    font-size: 1.6em;
+    color: #ffffff;
 }
 
 header a {
-    color: #007bff;
+    color: #ffffff;
     text-decoration: none;
     font-weight: bold;
 }
 
 .section {
-    background: #fff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(120deg, #232526 0%, #3a3a3a 100%);
+    padding: 30px 25px 25px 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    margin-bottom: 0;
+    width: 100%;
 }
 
 .section h2 {
     text-align: center;
     margin-top: 0;
     margin-bottom: 20px;
-    color: #333;
-    border-bottom: 2px solid #f0f2f5;
+    color: #ffffff;
+    border-bottom: 2px solid #444;
     padding-bottom: 10px;
+    letter-spacing: 1px;
 }
 
 /* Formulare */
@@ -62,9 +66,11 @@ header a {
 input[type="text"], input[type="date"], textarea {
     flex-grow: 1;
     padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid #444;
+    border-radius: 8px;
     font-size: 1em;
+    background: #232526;
+    color: #fff;
 }
 textarea {
     resize: vertical;
@@ -73,15 +79,15 @@ textarea {
 button {
     padding: 12px 18px;
     border: none;
-    background: #007bff;
-    color: white;
-    border-radius: 6px;
+    background: #00bbff;
+    color: #232526;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.2s;
 }
 button:hover {
-    background: #0056b3;
+    background: #0300ae;
 }
 
 /* Listen (Checkliste & Termine) */
@@ -90,16 +96,19 @@ ul {
     padding: 0;
 }
 li {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
+    padding: 14px;
+    border-bottom: 1px solid #444;
     display: flex;
     justify-content: space-between;
     align-items: center;
     word-break: break-word;
+    background: #2c2c2c;
+    border-radius: 6px;
+    margin-bottom: 8px;
 }
 li a {
     text-decoration: none;
-    color: #333;
+    color: #ffffff;
     flex-grow: 1;
 }
 li.done a {
@@ -109,22 +118,27 @@ li.done a {
 
 /* Notizen */
 .note {
-    background: #f9f9f9;
-    border-left: 4px solid #007bff;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    background: #232526;
+    border-left: 4px solid #ffb347;
+    padding: 18px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    color: #f0f2f5;
 }
 .note p { margin: 0; }
 
 /* Löschen-Button */
 .delete-btn {
-    color: #dc3545;
-    font-size: 0.9em;
-    margin-left: 15px;
+    color: #ff6f61;
+    font-size: 0.95em;
+    margin-left: 18px;
     flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
 }
-.delete-btn:hover { text-decoration: underline; }
+.delete-btn:hover { color: #0b00ab; }
 
 /* Kalender */
 #calendar-section {
@@ -166,4 +180,22 @@ li.done a {
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #f5c6cb;
+}
+
+#jsmind_container {
+    width: 100% !important;
+    height: 420px !important;
+    background: #232526 !important;
+    border: 2px solid #444 !important;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 900px) {
+    .container {
+        max-width: 900px;
+    }
+    .section {
+        min-height: 520px;
+    }
 }

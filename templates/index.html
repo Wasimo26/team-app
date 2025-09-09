@@ -6,6 +6,8 @@
     <title>Team-Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <!-- jsMind CSS -->
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsmind@0.8.0/style/jsmind.css" />
 </head>
 <body>
     <header>
@@ -14,6 +16,13 @@
     </header>
 
     <div class="container">
+        <div class="section">
+            <h2>🧠 Live Mindmap</h2>
+            <div id="jsmind_container" style="width:100%;height:400px;background:#ffffff;border:1px solid #ffffff;"></div>
+            <div style="margin-top:10px;">
+                <button onclick="addNode()">Knoten hinzufügen</button>
+            </div>
+        </div>
         <div class="section">
             <h2>✔ Checkliste</h2>
             <form action="{{ url_for('add_task') }}" method="POST" class="input-form">
@@ -68,6 +77,56 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <!-- jsMind -->
+    <script src="https://cdn.jsdelivr.net/npm/jsmind@0.8.0/es6/jsmind.js"></script>
+    <script>
+    // --- Mindmap Live-Logik ---
+    const socket = io();
+    let jm = null;
+    let mindmapData = {{ mindmap_data|tojson|safe }};
+
+    function showMindmap(data) {
+        const options = {
+            container: 'jsmind_container',
+            editable: true,
+            theme: 'primary',
+        };
+        jm = new jsMind(options);
+        jm.show(data);
+        jm.add_event_listener(function(type, data) {
+            if(type === 'edit') {
+                // Sende neue Daten an Server
+                socket.emit('update_mindmap', jm.get_data());
+            }
+        });
+    }
+
+    // Initial Mindmap anzeigen
+    document.addEventListener('DOMContentLoaded', function() {
+        showMindmap(mindmapData);
+    });
+
+    // Live-Update empfangen
+    socket.on('mindmap_update', function(data) {
+        jm.show(data);
+    });
+
+    // Beispiel: Knoten hinzufügen
+    function addNode() {
+        let selected = jm.get_selected_node();
+        if(!selected) {
+            // Wenn kein Knoten ausgewählt, nimm Root-Knoten
+            selected = jm.get_root();
+        }
+        if(selected) {
+            const nodeid = 'n' + (new Date().getTime());
+            jm.add_node(selected, nodeid, 'Neuer Knoten');
+            socket.emit('update_mindmap', jm.get_data());
+        }
+    }
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
@@ -85,6 +144,19 @@
             });
             calendar.render();
         });
+    </script>
+    <script>
+    // Entferne das automatische Scrollen nach oben beim Absenden von Formularen
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Alle Formulare abfangen
+        document.querySelectorAll('form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                // Verhindere das automatische Scrollen nach oben
+                window.scrollTo({ top: window.scrollY });
+            });
+        });
+    });
     </script>
 </body>
 </html>
